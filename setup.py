@@ -16,5 +16,4 @@ setup(
             'emaysms = emaysms.main:main',
         ]
     }
-
 )
