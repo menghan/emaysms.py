@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
+import sys
+import logging
 from urllib2 import urlopen, URLError
 from urllib import urlencode
 from getopt import gnu_getopt as getopt, GetoptError
-import sys
-import logging
 import xml.etree.ElementTree as ET
 
 
@@ -63,7 +63,7 @@ class EmaySMS(object):
 
         self.api('registdetailinfo', {
             'ename': name,
-            'linkman': contact,  # I HATE POOR ENGLIHS!!! WTF is linkman??
+            'linkman': contact,  # I HATE POOR ENGLISH!!! WTF is linkman??
             'phonenum': tel,
             'mobile': mobile,
             'email': email,

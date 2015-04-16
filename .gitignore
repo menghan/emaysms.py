@@ -1,1 +1,4 @@
-key
+.*.swp
+*.pyc
+MANIFEST
+/dist/
