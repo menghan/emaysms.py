@@ -17,23 +17,23 @@ class EmaySMSException(Exception):
 
 
 class EmaySMS(object):
-    def __init__(self, cdkey, password):
-        self.cdkey      = cdkey
-        self.password   = password
 
+    def __init__(self, cdkey, password):
+        self.cdkey = cdkey
+        self.password = password
 
     def api(self, action, data):
-        data['cdkey']       = self.cdkey
-        data['password']    = self.password
+        data['cdkey'] = self.cdkey
+        data['password'] = self.password
 
         try:
-            f   = urlopen(ENDPOINT_URL + action + '.action', urlencode(data))
+            f = urlopen(ENDPOINT_URL + action + '.action', urlencode(data))
             xml = f.read().strip()
         except URLError as e:
             raise EmaySMSException(e)
 
         try:
-            e   = ET.fromstring(xml) 
+            e = ET.fromstring(xml)
             err = int(e.find('error').text)
             msg = e.find('message').text
         except ET.ParseError as e:
@@ -44,37 +44,33 @@ class EmaySMS(object):
         else:           # Looks good
             return msg
 
-
     def register(self):
         '''
         Register the cdkey once and for all. A cdkey must be registered before
         you can use it to send SMS. A cdkey needs to be re-registered if it is
-        de-registered before. 
+        de-registered before.
         '''
 
         self.api('regist', {})
 
-
     def deregister(self):
         ' De-register a cdkey '
         self.api('logout', {})
-
 
     def register_detail_info(self, cdkey, password, name, contact, tel,
                              mobile, email, fax, address, zipcode):
         ' Register your company\'s detailed information. '
 
         self.api('registdetailinfo', {
-            'ename'     : name,
-            'linkman'   : contact,  # I HATE POOR ENGLIHS!!! WTF is linkman??
-            'phonenum'  : tel,
-            'mobile'    : mobile,
-            'email'     : email,
-            'fax'       : fax,
-            'address'   : address,
-            'postcode'  : zipcode
+            'ename': name,
+            'linkman': contact,  # I HATE POOR ENGLIHS!!! WTF is linkman??
+            'phonenum': tel,
+            'mobile': mobile,
+            'email': email,
+            'fax': fax,
+            'address': address,
+            'postcode': zipcode
         })
-
 
     def send(self, phone_numbers, message, time=None, serial=None):
         ' Send an instant SMS to a list of phone numbers '
@@ -82,16 +78,16 @@ class EmaySMS(object):
         if not isinstance(message, unicode):
             raise EmaySMSException('Message must be a Unicode string. ')
 
-        # Max 500 chars (same for UTF-8 and ASCII) per message. It will be 
+        # Max 500 chars (same for UTF-8 and ASCII) per message. It will be
         # split into 70 chars chunks before sending to mobile phones. The 4.1.0
-        # HTTP SDK is wrong about the 1,000 chars limit for ASCII chars. 
+        # HTTP SDK is wrong about the 1,000 chars limit for ASCII chars.
         if len(message) > 500:
             raise EmaySMSException('Message too long. ')
 
         numbers = ','.join(phone_numbers)
-        msg     = message.encode('utf-8')
+        msg = message.encode('utf-8')
         logging.debug('{0} | "{1}"'.format(numbers, msg))
-        data    = {'phone': numbers, 'message': msg}
+        data = {'phone': numbers, 'message': msg}
 
         if time is None:
             action = 'sendsms'
@@ -112,11 +108,9 @@ class EmaySMS(object):
 
         self.api(action, data)
 
-
     @property
     def sent(self):
         return self.api('getmo', {})
-
 
     @property
     def balance(self):
@@ -124,19 +118,15 @@ class EmaySMS(object):
         msg = self.api('querybalance', {})
         return float(msg)
 
-
     def recharge(self, card_number, card_password):
         ' Recharge account using a prepaid card '
         self.api('chargeup', {'cardno': card_number, 'cardpass': card_password})
-        
 
     def change_password(self, new_password):
         self.api('changepassword', {'newPassword': new_password})
 
 
-
-
-if __name__ == "__main__" : 
+if __name__ == "__main__":
 
     USAGE = '''
 Usage: emaysms.py -k [KEY FILE] [ACTION] [ARGS]
@@ -153,10 +143,10 @@ Register a key file. A key file must be registered before it can be used:
 
 De-register a key file:
 
-    emaysms.py deregister -k [KEY FILE] 
+    emaysms.py deregister -k [KEY FILE]
 
 
-Send an SMS. If `-t` option is omitted, the message is sent immediately. Otherwise, the message is sent at the given time by `-t`. SMS content is read from stdin, with up to 500 Chinese characters or 1,000 ASCII characters. 
+Send an SMS. If `-t` option is omitted, the message is sent immediately. Otherwise, the message is sent at the given time by `-t`. SMS content is read from stdin, with up to 500 Chinese characters or 1,000 ASCII characters.
 
     echo "Hello World!" | emaysms.py send -k [KEY FILE] [-t YYYYMMDDHHMMSS] PHONE1 [PHONE2 ...]
 
@@ -184,7 +174,6 @@ Key file format
     password=123456
 '''
 
-
     def parse_key_file(filename):
         try:
             for line in open(filename).readlines():
@@ -200,9 +189,8 @@ Key file format
             if e.errno == 2:
                 sys.exit('Key file "{0}" not found. '.format(filename))
 
-
-
     class Actions():
+
         ' Command containter '
 
         @staticmethod
@@ -220,41 +208,32 @@ Key file format
 
             emay.send(numbers, msg)
 
-        
         @staticmethod
         def sent(emay, opts, args):
             print emay.sent
-
 
         @staticmethod
         def balance(emay, opts, args):
             print emay.balance
 
-        
         @staticmethod
         def recharge(emay, opts, args):
-            card_number     = args[0]
-            card_password   = args[1]
+            card_number = args[0]
+            card_password = args[1]
             emay.recharge(card_number, card_password)
-
 
         @staticmethod
         def changepassword(emay, opts, args):
             new_password = args[0]
             emay.change_password(new_password)
 
-
         @staticmethod
         def register(emay, opts, args):
             emay.register()
 
-
         @staticmethod
         def deregister(emay, opts, args):
             emay.deregister()
-
-
-
 
     def main():
 
@@ -268,11 +247,10 @@ Key file format
             sys.exit(USAGE)
 
         if len(args) > 0:
-            action  = args[0].lower()
-            args    = args[1:]
+            action = args[0].lower()
+            args = args[1:]
         else:
             sys.exit('Action required. ')
-
 
         if not hasattr(Actions, action):
             sys.exit('Unknonw action {0}'.format(action))
@@ -287,7 +265,5 @@ Key file format
             getattr(Actions, action)(emay, opts, args)
         except EmaySMSException as e:
             sys.exit(e)
-
-
 
     main()
