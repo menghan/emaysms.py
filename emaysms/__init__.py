@@ -18,6 +18,7 @@ class EmaySMS(object):
     def __init__(self, cdkey, password):
         self.cdkey = cdkey
         self.password = password
+        self.registered = False
 
     def api(self, action, data):
         data['cdkey'] = self.cdkey
@@ -48,11 +49,15 @@ class EmaySMS(object):
         de-registered before.
         '''
 
-        self.api('regist', {})
+        if not self.registered:
+            self.api('regist', {})
+            self.registered = True
 
     def deregister(self):
         ' De-register a cdkey '
-        self.api('logout', {})
+        if self.registered:
+            self.api('logout', {})
+            self.registered = False
 
     def register_detail_info(self, cdkey, password, name, contact, tel,
                              mobile, email, fax, address, zipcode):
