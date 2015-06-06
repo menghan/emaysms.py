@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='emaysms',
-    version='1.0',
+    version='1.1',
     description='Python client for Emay.cn SMS service using HTTP SDK',
     long_description=open('README').read(),
     author='menghan',
