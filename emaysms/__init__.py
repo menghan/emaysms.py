@@ -63,7 +63,7 @@ class EmaySMS(object):
                              mobile, email, fax, address, zipcode):
         ' Register your company\'s detailed information. '
 
-        self.api('registdetailinfo', {
+        return self.api('registdetailinfo', {
             'ename': name,
             'linkman': contact,  # I HATE POOR ENGLISH!!! WTF is linkman??
             'phonenum': tel,
@@ -108,7 +108,7 @@ class EmaySMS(object):
                 raise EmaySMSException('Serial too long. Max 10 digits. ')
             data['addserial'] = serial
 
-        self.api(action, data)
+        return self.api(action, data)
 
     @property
     def sent(self):
@@ -122,7 +122,7 @@ class EmaySMS(object):
 
     def recharge(self, card_number, card_password):
         ' Recharge account using a prepaid card '
-        self.api('chargeup', {'cardno': card_number, 'cardpass': card_password})
+        return self.api('chargeup', {'cardno': card_number, 'cardpass': card_password})
 
     def change_password(self, new_password):
-        self.api('changepassword', {'newPassword': new_password})
+        return self.api('changepassword', {'newPassword': new_password})
