@@ -15,10 +15,16 @@ class EmaySMSException(Exception):
 
 class EmaySMS(object):
 
-    def __init__(self, cdkey, password):
+    def __init__(self, cdkey=None, password=None):
         self.cdkey = cdkey
         self.password = password
         self.registered = False
+
+    def init(self, cdkey, password):
+        if cdkey != self.cdkey or password != self.password:
+            self.cdkey = cdkey
+            self.password = password
+            self.registered = False
 
     def api(self, action, data):
         data['cdkey'] = self.cdkey
